@@ -19,7 +19,7 @@ p := parser.NewJWTParser(&parser.Options{
     },
     // Defaults to 'Authorization' header being: Bearer <token>
     Extractor: func(r *http.Request) (string, error) {
-        return r.Header.Get("X-Authorization")
+        return r.Header.Get("X-Authorization"), nil
     },
     // This is the default:
     SigningMethod: jwt.SigningMethodHS256,
