@@ -12,7 +12,7 @@ A utility package that uses [jwt-go](https://github.com/dgrijalva/jwt-go) for pa
 Create a new parser (all options are optional):
 
 ```go
-p := parser.NewJWTParser(&parser.Options{
+p := parser.New(&parser.Options{
     // Defaults to 'nil'
     Keyfunc: func(_ *jwt.Token) (interface{}, error) {
         return []byte("secretAF"), nil

@@ -28,7 +28,7 @@ type JWTParser struct {
 
 // NewJWTParser returns a new JWTParser with the given options.
 // It supplies default options for some fields (check Options type for details).
-func NewJWTParser(o *Options) *JWTParser {
+func New(o *Options) *JWTParser {
 	if o.Extractor == nil {
 		o.Extractor = FromAuthHeader
 	}

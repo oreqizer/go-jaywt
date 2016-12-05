@@ -13,8 +13,8 @@ import (
 const sampleSecret = "wowSecurity9001"
 const sampleSubject = "auth0|asdfomfg12345678"
 
-func TestNewJWTParserDefault(t *testing.T) {
-	parser := NewJWTParser(&Options{})
+func TestNewDefault(t *testing.T) {
+	parser := New(&Options{})
 
 	if parser.Options.Extractor == nil {
 		t.Error("Extractor should be 'FromAuthHeader'")
@@ -34,8 +34,8 @@ func TestNewJWTParserDefault(t *testing.T) {
 const customKey = "IAmACustomKeyLol"
 const customExtractor = "I am the custom fn"
 
-func TestNewJWTParserCustom(t *testing.T) {
-	parser := NewJWTParser(&Options{
+func TestNewCustom(t *testing.T) {
+	parser := New(&Options{
 		Keyfunc: func(_ *jwt.Token) (interface{}, error) {
 			return customKey, nil
 		},
@@ -122,7 +122,7 @@ func TestCheckJWTOk(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
@@ -144,7 +144,7 @@ func TestCheckJWTBadExtraction(t *testing.T) {
 
 	// No 'Bearer'
 	req.Header.Set("Authorization", token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
@@ -161,7 +161,7 @@ func TestCheckJWTBadExtraction(t *testing.T) {
 
 func TestCheckJWTNoToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
@@ -187,7 +187,7 @@ func TestCheckJWTBadKeyfunc(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: badKeyfunc,
 	})
 
@@ -213,7 +213,7 @@ func TestCheckJWTBadSigning(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
@@ -242,7 +242,7 @@ func TestCheckJWTWithClaimsOk(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
@@ -278,7 +278,7 @@ func TestCheckJWTWithClaimsBadExtraction(t *testing.T) {
 
 	// No 'Bearer'
 	req.Header.Set("Authorization", token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
@@ -295,7 +295,7 @@ func TestCheckJWTWithClaimsBadExtraction(t *testing.T) {
 
 func TestCheckJWTWithClaimsNoToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
@@ -324,7 +324,7 @@ func TestCheckJWTWithClaimsBadKeyfunc(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: badKeyfunc,
 	})
 
@@ -353,7 +353,7 @@ func TestCheckJWTWithClaimsBadSigning(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
@@ -382,7 +382,7 @@ func TestCheckJWTWithClaimsInvalid(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := NewJWTParser(&Options{
+	parser := New(&Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
