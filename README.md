@@ -7,7 +7,7 @@ A utility package that uses [jwt-go](https://github.com/dgrijalva/jwt-go) for pa
 
 > While it solves the exact problem [go-jwt-middleware](https://github.com/auth0/go-jwt-middleware) does, it doesn't have Gorilla context as a dependency and lets you use your own type of claims.
 
-### Usage
+## Usage
 
 Create a new parser (all options are optional):
 
@@ -44,7 +44,9 @@ func AuthMiddleware(p *parser.JWTParser) gin.HandlerFunc {
 }
 ```
 
-Custom claims are also supported:
+### Custom claims
+
+Pass your claims struct as a second argument to `CheckJWTWithClaims`:
 
 ```go
 type MyClaims struct {
@@ -55,7 +57,7 @@ type MyClaims struct {
 
 func AuthMiddleware(p *parser.JWTParser) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := m.CheckJWTWithClaims(c.Request, &MyClaims{})
+		token, err := p.CheckJWTWithClaims(c.Request, &MyClaims{})
         if err != nil {
             c.AbortWithError(http.StatusUnauthorized, err)
             return
