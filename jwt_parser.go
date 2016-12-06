@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// TokenExtractor is a function retrieving the raw token string from a request.
 type TokenExtractor func(r *http.Request) (string, error)
 
 type Options struct {
@@ -26,7 +27,7 @@ type JWTParser struct {
 	Options *Options
 }
 
-// NewJWTParser returns a new JWTParser with the given options.
+// New returns a new JWTParser with the given options.
 // It supplies default options for some fields (check Options type for details).
 func New(o *Options) *JWTParser {
 	if o.Extractor == nil {
