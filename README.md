@@ -1,6 +1,7 @@
 # JWT Parser
 
 [![godoc](http://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square)](https://godoc.org/github.com/oreqizer/go-jwt-parser)
+[![Build Status](https://travis-ci.org/oreqizer/go-jwt-parser.svg?branch=master)](https://travis-ci.org/oreqizer/go-jwt-parser)
 [![codecov](https://codecov.io/gh/oreqizer/go-jwt-parser/branch/master/graph/badge.svg)](https://codecov.io/gh/oreqizer/go-jwt-parser)
 
 A utility package that uses [jwt-go](https://github.com/dgrijalva/jwt-go) for parsing and verifying JWT tokens from requests.
@@ -26,7 +27,9 @@ p := parser.New(&parser.Options{
 })
 ```
 
-Then create any middleware you like! All you need is a `http.Request`. An example using [gin](https://github.com/gin-gonic/gin):
+### Middleware
+
+Create any middleware you like! All you need is a `http.Request`. An example using [gin](https://github.com/gin-gonic/gin):
 
 ```go
 // usage: api.Use(AuthMiddleware(p))
