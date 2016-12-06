@@ -10,6 +10,14 @@ A utility package that uses [jwt-go](https://github.com/dgrijalva/jwt-go) for pa
 
 ## Usage
 
+The API basically consists of three important functions and an `Options` struct:
+
+* Create a new parser with `parser.New(&parser.Options{})`
+* Parse & verify a JWT using `parser.CheckJWT(token)`
+* Parse & verify a JWT with custom claims using `parser.CheckJWTWithClaims(token, &MyClaims{})`
+
+## Examples
+
 Create a new parser (all options are optional):
 
 ```go
@@ -27,7 +35,7 @@ p := parser.New(&parser.Options{
 })
 ```
 
-### Middleware
+### Parse JWT
 
 Create any middleware you like! All you need is a `http.Request`. An example using [gin](https://github.com/gin-gonic/gin):
 
@@ -47,7 +55,7 @@ func AuthMiddleware(p *parser.JWTParser) gin.HandlerFunc {
 }
 ```
 
-### Custom claims
+### Parse JWT + custom claims
 
 Pass your claims struct as a second argument to `CheckJWTWithClaims`:
 
