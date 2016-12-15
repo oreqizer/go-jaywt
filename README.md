@@ -13,8 +13,8 @@ A utility package that uses [jwt-go](https://github.com/dgrijalva/jwt-go) for pa
 The API basically consists of three important functions and an `Options` struct:
 
 * Create a new parser with `parser.New(&parser.Options{})`
-* Parse & verify a JWT using `parser.CheckJWT(token)`
-* Parse & verify a JWT with custom claims using `parser.CheckJWTWithClaims(token, &MyClaims{})`
+* Parse & verify a JWT using `parser.CheckJWT(request)`
+* Parse & verify a JWT with custom claims using `parser.CheckJWTWithClaims(request, &MyClaims{})`
 
 ## Examples
 
