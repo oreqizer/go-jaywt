@@ -1,7 +1,8 @@
-package parser
+package parser_test
 
 import (
 	"errors"
+	"github.com/oreqizer/go-jwt-parser"
 	"gopkg.in/dgrijalva/jwt-go.v3"
 	"net/http"
 	"net/http/httptest"
@@ -14,19 +15,19 @@ const sampleSecret = "wowSecurity9001"
 const sampleSubject = "auth0|asdfomfg12345678"
 
 func TestNewDefault(t *testing.T) {
-	parser := New(&Options{})
+	p := parser.New(&parser.Options{})
 
-	if parser.Options.Extractor == nil {
+	if p.Options.Extractor == nil {
 		t.Error("Extractor should be 'FromAuthHeader'")
 	}
 
-	inputAlg := parser.Options.SigningMethod.Alg()
+	inputAlg := p.Options.SigningMethod.Alg()
 	wantAlg := jwt.SigningMethodHS256.Alg()
 	if inputAlg != wantAlg {
 		t.Errorf("SigningMethod == %s, want %s", inputAlg, wantAlg)
 	}
 
-	if parser.Options.Keyfunc != nil {
+	if p.Options.Keyfunc != nil {
 		t.Error("Keyfunc must default to 'nil'")
 	}
 }
@@ -35,7 +36,7 @@ const customKey = "IAmACustomKeyLol"
 const customExtractor = "I am the custom fn"
 
 func TestNewCustom(t *testing.T) {
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: func(_ *jwt.Token) (interface{}, error) {
 			return customKey, nil
 		},
@@ -45,15 +46,15 @@ func TestNewCustom(t *testing.T) {
 		SigningMethod: jwt.SigningMethodHS384,
 	})
 
-	if res, _ := parser.Options.Keyfunc(nil); res != customKey {
+	if res, _ := p.Options.Keyfunc(nil); res != customKey {
 		t.Errorf("Keyfunc: Got %s, want %s", res, customKey)
 	}
 
-	if res, _ := parser.Options.Extractor(nil); res != customExtractor {
+	if res, _ := p.Options.Extractor(nil); res != customExtractor {
 		t.Errorf("Extractor: Got %s, want %s", res, customExtractor)
 	}
 
-	inputAlg := parser.Options.SigningMethod.Alg()
+	inputAlg := p.Options.SigningMethod.Alg()
 	wantAlg := jwt.SigningMethodHS384.Alg()
 	if inputAlg != wantAlg {
 		t.Errorf("SigningMethod == %s, want %s", inputAlg, wantAlg)
@@ -67,7 +68,7 @@ func TestFromAuthHeaderOk(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Set("Authorization", headerOk)
 
-	token, err := FromAuthHeader(req)
+	token, err := parser.FromAuthHeader(req)
 	if err != nil {
 		t.Error(err)
 		return
@@ -90,7 +91,7 @@ func TestFromAuthHeaderBad(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set("Authorization", header)
 
-		_, err := FromAuthHeader(req)
+		_, err := parser.FromAuthHeader(req)
 		if err == nil {
 			t.Errorf("Error was expected, got nil")
 		}
@@ -100,7 +101,7 @@ func TestFromAuthHeaderBad(t *testing.T) {
 func TestFromAuthHeaderEmpty(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 
-	token, err := FromAuthHeader(req)
+	token, err := parser.FromAuthHeader(req)
 	if err != nil {
 		t.Error(err)
 		return
@@ -122,11 +123,11 @@ func TestCheckJWTOk(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = parser.CheckJWT(req)
+	_, err = p.CheckJWT(req)
 	if err != nil {
 		t.Error(err)
 	}
@@ -144,11 +145,11 @@ func TestCheckJWTBadExtraction(t *testing.T) {
 
 	// No 'Bearer'
 	req.Header.Set("Authorization", token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = parser.CheckJWT(req)
+	_, err = p.CheckJWT(req)
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -161,11 +162,11 @@ func TestCheckJWTBadExtraction(t *testing.T) {
 
 func TestCheckJWTNoToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err := parser.CheckJWT(req)
+	_, err := p.CheckJWT(req)
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -187,11 +188,11 @@ func TestCheckJWTBadKeyfunc(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: badKeyfunc,
 	})
 
-	_, err = parser.CheckJWT(req)
+	_, err = p.CheckJWT(req)
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -213,11 +214,11 @@ func TestCheckJWTBadSigning(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = parser.CheckJWT(req)
+	_, err = p.CheckJWT(req)
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -242,11 +243,11 @@ func TestCheckJWTWithClaimsOk(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	parsed, err := parser.CheckJWTWithClaims(req, &jwt.StandardClaims{})
+	parsed, err := p.CheckJWTWithClaims(req, &jwt.StandardClaims{})
 	if err != nil {
 		t.Error(err)
 		return
@@ -278,11 +279,11 @@ func TestCheckJWTWithClaimsBadExtraction(t *testing.T) {
 
 	// No 'Bearer'
 	req.Header.Set("Authorization", token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = parser.CheckJWTWithClaims(req, &jwt.StandardClaims{})
+	_, err = p.CheckJWTWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -295,11 +296,11 @@ func TestCheckJWTWithClaimsBadExtraction(t *testing.T) {
 
 func TestCheckJWTWithClaimsNoToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err := parser.CheckJWTWithClaims(req, &jwt.StandardClaims{})
+	_, err := p.CheckJWTWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -324,11 +325,11 @@ func TestCheckJWTWithClaimsBadKeyfunc(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: badKeyfunc,
 	})
 
-	_, err = parser.CheckJWTWithClaims(req, &jwt.StandardClaims{})
+	_, err = p.CheckJWTWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -353,11 +354,11 @@ func TestCheckJWTWithClaimsBadSigning(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = parser.CheckJWTWithClaims(req, &jwt.StandardClaims{})
+	_, err = p.CheckJWTWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -382,11 +383,11 @@ func TestCheckJWTWithClaimsInvalid(t *testing.T) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	parser := New(&Options{
+	p := parser.New(&parser.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = parser.CheckJWTWithClaims(req, &jwt.StandardClaims{})
+	_, err = p.CheckJWTWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
