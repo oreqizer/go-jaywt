@@ -69,16 +69,16 @@ type MyClaims struct {
 func AuthMiddleware(p *parser.JWTParser) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := p.CheckJWTWithClaims(c.Request, &MyClaims{})
-        if err != nil {
-            c.AbortWithError(http.StatusUnauthorized, err)
-            return
-        }
-        
-        claims, ok := token.Claims.(*MyClaims) 
-        if !ok {
-		    c.AbortWithStatus(http.StatusUnauthorized)
-		    return
-	    }
+		if err != nil {
+			c.AbortWithError(http.StatusUnauthorized, err)
+			return
+		}
+
+		claims, ok := token.Claims.(*MyClaims) 
+		if !ok {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 
 		c.Set("userId", claims.Subject)
 		c.Set("doe", claims.Doe)
