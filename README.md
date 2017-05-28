@@ -12,7 +12,7 @@ A utility package that provides a DRY approach to parsing and validating JWT tok
 
 The API basically consists of three important functions and an `Options` struct:
 
-* Create a new core with `jaywt.New(&jaywt.Options{})`
+* Create a new instance with `jaywt.New(&jaywt.Options{})`
 * Parse & verify a JWT using `jaywt.Check(request)`
 * Parse & verify a JWT with custom claims using `jaywt.CheckWithClaims(request, &MyClaims{})`
 
@@ -22,7 +22,7 @@ The API basically consists of three important functions and an `Options` struct:
 
 ## Examples
 
-Create a new core (all options are optional):
+Create an instance (all options are optional):
 
 ```go
 j := jaywt.New(&jaywt.Options{
@@ -39,7 +39,7 @@ j := jaywt.New(&jaywt.Options{
 })
 ```
 
-### Parse JWT
+### Check JWT
 
 Create any middleware you like! All you need is a `http.Request`. An example using [gin](https://github.com/gin-gonic/gin):
 
@@ -59,7 +59,7 @@ func AuthMiddleware(j *jaywt.Core) gin.HandlerFunc {
 }
 ```
 
-### Parse JWT + custom claims
+### Check JWT with claims
 
 Pass your claims struct as a second argument to `CheckWithClaims`:
 
@@ -90,5 +90,7 @@ func AuthMiddleware(j *jaywt.Core) gin.HandlerFunc {
 	}
 }
 ```
+
+---
 
 License: **MIT**
