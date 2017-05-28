@@ -1,4 +1,4 @@
-# Jaywt
+# JayWT
 
 [![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/oreqizer/go-jaywt)
 [![Build Status](https://travis-ci.org/oreqizer/go-jaywt.svg?branch=master)](https://travis-ci.org/oreqizer/go-jaywt)
