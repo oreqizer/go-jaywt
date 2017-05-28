@@ -1,10 +1,10 @@
-# JWT Parser
+# Jaywt
 
-[![godoc](http://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square)](https://godoc.org/github.com/oreqizer/go-jwt-parser)
-[![Build Status](https://travis-ci.org/oreqizer/go-jwt-parser.svg?branch=master)](https://travis-ci.org/oreqizer/go-jwt-parser)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/oreqizer/go-jwt-parser)
+[![Build Status](https://travis-ci.org/oreqizer/go-jwt-jaywt.svg?branch=master)](https://travis-ci.org/oreqizer/go-jwt-parser)
 [![codecov](https://codecov.io/gh/oreqizer/go-jwt-parser/branch/master/graph/badge.svg)](https://codecov.io/gh/oreqizer/go-jwt-parser)
 
-A utility package that uses [jwt-go](https://github.com/dgrijalva/jwt-go) for parsing and verifying JWT tokens from requests.
+A utility package that provides a DRY approach to parsing and validating JWT tokens.
 
 > While it solves the exact problem [go-jwt-middleware](https://github.com/auth0/go-jwt-middleware) does, it doesn't have Gorilla context as a dependency and lets you use your own type of claims.
 
@@ -12,16 +12,20 @@ A utility package that uses [jwt-go](https://github.com/dgrijalva/jwt-go) for pa
 
 The API basically consists of three important functions and an `Options` struct:
 
-* Create a new parser with `parser.New(&parser.Options{})`
-* Parse & verify a JWT using `parser.CheckJWT(request)`
-* Parse & verify a JWT with custom claims using `parser.CheckJWTWithClaims(request, &MyClaims{})`
+* Create a new core with `jaywt.New(&jaywt.Options{})`
+* Parse & verify a JWT using `jaywt.Check(request)`
+* Parse & verify a JWT with custom claims using `jaywt.CheckWithClaims(request, &MyClaims{})`
+
+### Dependencies
+
+* [jwt-go](https://github.com/dgrijalva/jwt-go)
 
 ## Examples
 
-Create a new parser (all options are optional):
+Create a new core (all options are optional):
 
 ```go
-p := parser.New(&parser.Options{
+j := jaywt.New(&jaywt.Options{
     // Defaults to 'nil'
     Keyfunc: func(_ *jwt.Token) (interface{}, error) {
         return []byte("secretAF"), nil
@@ -41,9 +45,9 @@ Create any middleware you like! All you need is a `http.Request`. An example usi
 
 ```go
 // usage: api.Use(AuthMiddleware(p))
-func AuthMiddleware(p *parser.JWTParser) gin.HandlerFunc {
+func AuthMiddleware(j *jaywt.Core) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := p.CheckJWT(c.Request)
+		token, err := j.Check(c.Request)
 		if err != nil {
 			c.AbortWithError(http.StatusUnauthorized, err)
 			return
@@ -57,7 +61,7 @@ func AuthMiddleware(p *parser.JWTParser) gin.HandlerFunc {
 
 ### Parse JWT + custom claims
 
-Pass your claims struct as a second argument to `CheckJWTWithClaims`:
+Pass your claims struct as a second argument to `CheckWithClaims`:
 
 ```go
 type MyClaims struct {
@@ -66,9 +70,9 @@ type MyClaims struct {
 	jwt.StandardClaims
 }
 
-func AuthMiddleware(p *parser.JWTParser) gin.HandlerFunc {
+func AuthMiddleware(j *jaywt.Core) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := p.CheckJWTWithClaims(c.Request, &MyClaims{})
+		token, err := j.CheckWithClaims(c.Request, &MyClaims{})
 		if err != nil {
 			c.AbortWithError(http.StatusUnauthorized, err)
 			return

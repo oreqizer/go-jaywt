@@ -1,4 +1,4 @@
-package parser
+package jaywt
 
 import (
 	"errors"
@@ -11,6 +11,7 @@ import (
 // TokenExtractor is a function retrieving the raw token string from a request.
 type TokenExtractor func(r *http.Request) (string, error)
 
+// Options determine the behavior of the checking functions.
 type Options struct {
 	// Function that will return the Key to the JWT, public key or shared secret.
 	// Defaults to nil.
@@ -23,13 +24,14 @@ type Options struct {
 	SigningMethod jwt.SigningMethod
 }
 
-type JWTParser struct {
+// Core is the main structure which provides an interface for checking the token.
+type Core struct {
 	Options *Options
 }
 
-// New returns a new JWTParser with the given options.
+// New returns a new Core with the given options.
 // It supplies default options for some fields (check Options type for details).
-func New(o *Options) *JWTParser {
+func New(o *Options) *Core {
 	if o.Extractor == nil {
 		o.Extractor = FromAuthHeader
 	}
@@ -38,7 +40,7 @@ func New(o *Options) *JWTParser {
 		o.SigningMethod = jwt.SigningMethodHS256
 	}
 
-	return &JWTParser{o}
+	return &Core{o}
 }
 
 // FromAuthHeader is the default extractor. It expects the 'Authorization' header
@@ -58,9 +60,9 @@ func FromAuthHeader(r *http.Request) (string, error) {
 	return parts[1], nil
 }
 
-// CheckJWT parses and validates the JWT token from the request. It returns
+// Check parses and validates the JWT token from the request. It returns
 // the parsed token, if successful.
-func (m *JWTParser) CheckJWT(r *http.Request) (*jwt.Token, error) {
+func (m *Core) Check(r *http.Request) (*jwt.Token, error) {
 	// Extract token
 	raw, err := m.rawToken(r)
 	if err != nil {
@@ -81,10 +83,10 @@ func (m *JWTParser) CheckJWT(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-// CheckJWTWithClaims parses and validates the JWT token from the request,
+// CheckWithClaims parses and validates the JWT token from the request,
 // as well as the supplied claims. It returns the parsed token with the
 // supplied claims, if successful.
-func (m *JWTParser) CheckJWTWithClaims(r *http.Request, claims jwt.Claims) (*jwt.Token, error) {
+func (m *Core) CheckWithClaims(r *http.Request, claims jwt.Claims) (*jwt.Token, error) {
 	// Extract token
 	raw, err := m.rawToken(r)
 	if err != nil {
@@ -108,7 +110,7 @@ func (m *JWTParser) CheckJWTWithClaims(r *http.Request, claims jwt.Claims) (*jwt
 // Helper functions
 // ---
 
-func (m *JWTParser) rawToken(r *http.Request) (string, error) {
+func (m *Core) rawToken(r *http.Request) (string, error) {
 	// Extract token
 	raw, err := m.Options.Extractor(r)
 	if err != nil {
@@ -123,7 +125,7 @@ func (m *JWTParser) rawToken(r *http.Request) (string, error) {
 	return raw, nil
 }
 
-func (m *JWTParser) validateToken(token *jwt.Token) error {
+func (m *Core) validateToken(token *jwt.Token) error {
 	// Verify hashing algorithm
 	if m.Options.SigningMethod.Alg() != token.Header["alg"] {
 		return errors.New("Error validating token algorithm")
