@@ -60,9 +60,9 @@ func FromAuthHeader(r *http.Request) (string, error) {
 	return parts[1], nil
 }
 
-// Check parses and validates the JWT token from the request. It returns
+// Get extracts and validates the JWT token from the request. It returns
 // the parsed token, if successful.
-func (m *Core) Check(r *http.Request) (*jwt.Token, error) {
+func (m *Core) Get(r *http.Request) (*jwt.Token, error) {
 	// Extract token
 	raw, err := m.rawToken(r)
 	if err != nil {
@@ -83,10 +83,10 @@ func (m *Core) Check(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-// CheckWithClaims parses and validates the JWT token from the request,
+// GetWithClaims extracts and validates the JWT token from the request,
 // as well as the supplied claims. It returns the parsed token with the
 // supplied claims, if successful.
-func (m *Core) CheckWithClaims(r *http.Request, claims jwt.Claims) (*jwt.Token, error) {
+func (m *Core) GetWithClaims(r *http.Request, claims jwt.Claims) (*jwt.Token, error) {
 	// Extract token
 	raw, err := m.rawToken(r)
 	if err != nil {
@@ -99,7 +99,7 @@ func (m *Core) CheckWithClaims(r *http.Request, claims jwt.Claims) (*jwt.Token, 
 		return nil, fmt.Errorf("Error parsing token: %v", err)
 	}
 
-	// Check if token is valid
+	// Get if token is valid
 	if err = m.validateToken(token); err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (m *Core) rawToken(r *http.Request) (string, error) {
 
 	// Check if token is present
 	if raw == "" {
-		return "", errors.New("Required authorization token not found")
+		return "", errors.New("Token not found")
 	}
 
 	return raw, nil
@@ -127,8 +127,8 @@ func (m *Core) rawToken(r *http.Request) (string, error) {
 
 func (m *Core) validateToken(token *jwt.Token) error {
 	// Verify hashing algorithm
-	if m.Options.SigningMethod.Alg() != token.Header["alg"] {
-		return errors.New("Error validating token algorithm")
+	if alg := m.Options.SigningMethod.Alg(); alg != token.Header["alg"] {
+		return fmt.Errorf("Invalid token algorithm. Wanted %s, got %s", alg, token.Header["alg"])
 	}
 
 	return nil

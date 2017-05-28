@@ -112,7 +112,7 @@ func TestFromAuthHeaderEmpty(t *testing.T) {
 	}
 }
 
-func TestCheckJWTOk(t *testing.T) {
+func TestGetOk(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.New(jwt.SigningMethodHS256)
 
@@ -127,13 +127,13 @@ func TestCheckJWTOk(t *testing.T) {
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = p.Check(req)
+	_, err = p.Get(req)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func TestCheckJWTBadExtraction(t *testing.T) {
+func TestGetBadExtraction(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.New(jwt.SigningMethodHS256)
 
@@ -149,7 +149,7 @@ func TestCheckJWTBadExtraction(t *testing.T) {
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = p.Check(req)
+	_, err = p.Get(req)
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -160,24 +160,24 @@ func TestCheckJWTBadExtraction(t *testing.T) {
 	}
 }
 
-func TestCheckJWTNoToken(t *testing.T) {
+func TestGetNoToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	p := jaywt.New(&jaywt.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err := p.Check(req)
+	_, err := p.Get(req)
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
 	}
 
-	if !strings.Contains(err.Error(), "token not found") {
-		t.Errorf("Got %s, want it to contain '%s'", err.Error(), "token not found")
+	if !strings.Contains(err.Error(), "not found") {
+		t.Errorf("Got %s, want it to contain '%s'", err.Error(), "not found")
 	}
 }
 
-func TestCheckJWTBadKeyfunc(t *testing.T) {
+func TestGetBadKeyfunc(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.New(jwt.SigningMethodHS256)
 
@@ -192,7 +192,7 @@ func TestCheckJWTBadKeyfunc(t *testing.T) {
 		Keyfunc: badKeyfunc,
 	})
 
-	_, err = p.Check(req)
+	_, err = p.Get(req)
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -203,7 +203,7 @@ func TestCheckJWTBadKeyfunc(t *testing.T) {
 	}
 }
 
-func TestCheckJWTBadSigning(t *testing.T) {
+func TestGetBadSigning(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.New(jwt.SigningMethodHS384)
 
@@ -218,18 +218,18 @@ func TestCheckJWTBadSigning(t *testing.T) {
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = p.Check(req)
+	_, err = p.Get(req)
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
 	}
 
-	if !strings.Contains(err.Error(), "validating token algorithm") {
-		t.Errorf("Got %s, want it to contain '%s'", err.Error(), "validating token algorithm")
+	if !strings.Contains(err.Error(), "token algorithm") {
+		t.Errorf("Got %s, want it to contain '%s'", err.Error(), "token algorithm")
 	}
 }
 
-func TestCheckJWTWithClaimsOk(t *testing.T) {
+func TestGetWithClaimsOk(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   sampleSubject,
@@ -247,7 +247,7 @@ func TestCheckJWTWithClaimsOk(t *testing.T) {
 		Keyfunc: sampleKeyfunc,
 	})
 
-	parsed, err := p.CheckWithClaims(req, &jwt.StandardClaims{})
+	parsed, err := p.GetWithClaims(req, &jwt.StandardClaims{})
 	if err != nil {
 		t.Error(err)
 		return
@@ -264,7 +264,7 @@ func TestCheckJWTWithClaimsOk(t *testing.T) {
 	}
 }
 
-func TestCheckJWTWithClaimsBadExtraction(t *testing.T) {
+func TestGetWithClaimsBadExtraction(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   sampleSubject,
@@ -283,7 +283,7 @@ func TestCheckJWTWithClaimsBadExtraction(t *testing.T) {
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = p.CheckWithClaims(req, &jwt.StandardClaims{})
+	_, err = p.GetWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -294,24 +294,24 @@ func TestCheckJWTWithClaimsBadExtraction(t *testing.T) {
 	}
 }
 
-func TestCheckJWTWithClaimsNoToken(t *testing.T) {
+func TestGetWithClaimsNoToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	p := jaywt.New(&jaywt.Options{
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err := p.CheckWithClaims(req, &jwt.StandardClaims{})
+	_, err := p.GetWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
 	}
 
-	if !strings.Contains(err.Error(), "token not found") {
-		t.Errorf("Got %s, want it to contain '%s'", err.Error(), "token not found")
+	if !strings.Contains(err.Error(), "not found") {
+		t.Errorf("Got %s, want it to contain '%s'", err.Error(), "not found")
 	}
 }
 
-func TestCheckJWTWithClaimsBadKeyfunc(t *testing.T) {
+func TestGetWithClaimsBadKeyfunc(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   sampleSubject,
@@ -329,7 +329,7 @@ func TestCheckJWTWithClaimsBadKeyfunc(t *testing.T) {
 		Keyfunc: badKeyfunc,
 	})
 
-	_, err = p.CheckWithClaims(req, &jwt.StandardClaims{})
+	_, err = p.GetWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
@@ -340,7 +340,7 @@ func TestCheckJWTWithClaimsBadKeyfunc(t *testing.T) {
 	}
 }
 
-func TestCheckJWTWithClaimsBadSigning(t *testing.T) {
+func TestGetWithClaimsBadSigning(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.NewWithClaims(jwt.SigningMethodHS384, jwt.StandardClaims{
 		Subject:   sampleSubject,
@@ -358,18 +358,18 @@ func TestCheckJWTWithClaimsBadSigning(t *testing.T) {
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = p.CheckWithClaims(req, &jwt.StandardClaims{})
+	_, err = p.GetWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return
 	}
 
-	if !strings.Contains(err.Error(), "validating token algorithm") {
-		t.Errorf("Got %s, want it to contain '%s'", err.Error(), "validating token algorithm")
+	if !strings.Contains(err.Error(), "token algorithm") {
+		t.Errorf("Got %s, want it to contain '%s'", err.Error(), "token algorithm")
 	}
 }
 
-func TestCheckJWTWithClaimsInvalid(t *testing.T) {
+func TestGetWithClaimsInvalid(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	raw := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   sampleSubject,
@@ -387,7 +387,7 @@ func TestCheckJWTWithClaimsInvalid(t *testing.T) {
 		Keyfunc: sampleKeyfunc,
 	})
 
-	_, err = p.CheckWithClaims(req, &jwt.StandardClaims{})
+	_, err = p.GetWithClaims(req, &jwt.StandardClaims{})
 	if err == nil {
 		t.Error("Expected error, got nil")
 		return

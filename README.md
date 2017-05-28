@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/oreqizer/go-jaywt.svg?branch=master)](https://travis-ci.org/oreqizer/go-jaywt)
 [![codecov](https://codecov.io/gh/oreqizer/go-jaywt/branch/master/graph/badge.svg)](https://codecov.io/gh/oreqizer/go-jaywt)
 
-A utility package that provides a DRY approach to parsing and validating JWT tokens.
+A utility package that provides a DRY approach to extracting and validating JWT tokens.
 
 > While it solves the exact problem [go-jwt-middleware](https://github.com/auth0/go-jwt-middleware) does, it doesn't have Gorilla context as a dependency and lets you use your own type of claims.
 
@@ -13,8 +13,8 @@ A utility package that provides a DRY approach to parsing and validating JWT tok
 The API basically consists of three important functions and an `Options` struct:
 
 * Create a new instance with `jaywt.New(&jaywt.Options{})`
-* Parse & verify a JWT using `jaywt.Check(request)`
-* Parse & verify a JWT with custom claims using `jaywt.CheckWithClaims(request, &MyClaims{})`
+* Extract & verify a JWT using `jaywt.Get(request)`
+* Extract & verify a JWT with custom claims using `jaywt.GetWithClaims(request, &MyClaims{})`
 
 ### Dependencies
 
@@ -39,7 +39,7 @@ j := jaywt.New(&jaywt.Options{
 })
 ```
 
-### Check JWT
+### Get JWT
 
 Create any middleware you like! All you need is a `http.Request`. An example using [gin](https://github.com/gin-gonic/gin):
 
@@ -47,7 +47,7 @@ Create any middleware you like! All you need is a `http.Request`. An example usi
 // usage: api.Use(AuthMiddleware(p))
 func AuthMiddleware(j *jaywt.Core) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := j.Check(c.Request)
+		token, err := j.Get(c.Request)
 		if err != nil {
 			c.AbortWithError(http.StatusUnauthorized, err)
 			return
@@ -59,9 +59,9 @@ func AuthMiddleware(j *jaywt.Core) gin.HandlerFunc {
 }
 ```
 
-### Check JWT with claims
+### Get JWT with claims
 
-Pass your claims struct as a second argument to `CheckWithClaims`:
+Pass your claims struct as a second argument to `GetWithClaims`:
 
 ```go
 type MyClaims struct {
@@ -72,7 +72,7 @@ type MyClaims struct {
 
 func AuthMiddleware(j *jaywt.Core) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := j.CheckWithClaims(c.Request, &MyClaims{})
+		token, err := j.GetWithClaims(c.Request, &MyClaims{})
 		if err != nil {
 			c.AbortWithError(http.StatusUnauthorized, err)
 			return
