@@ -1,8 +1,8 @@
 # Jaywt
 
-[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/oreqizer/go-jwt-parser)
-[![Build Status](https://travis-ci.org/oreqizer/go-jwt-jaywt.svg?branch=master)](https://travis-ci.org/oreqizer/go-jwt-parser)
-[![codecov](https://codecov.io/gh/oreqizer/go-jwt-parser/branch/master/graph/badge.svg)](https://codecov.io/gh/oreqizer/go-jwt-parser)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/oreqizer/go-jaywt)
+[![Build Status](https://travis-ci.org/oreqizer/go-jaywt.svg?branch=master)](https://travis-ci.org/oreqizer/go-jaywt)
+[![codecov](https://codecov.io/gh/oreqizer/go-jaywt/branch/master/graph/badge.svg)](https://codecov.io/gh/oreqizer/go-jaywt)
 
 A utility package that provides a DRY approach to parsing and validating JWT tokens.
 
