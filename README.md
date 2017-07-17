@@ -91,6 +91,6 @@ func AuthMiddleware(j *jaywt.Core) gin.HandlerFunc {
 }
 ```
 
----
+## License
 
-License: **MIT**
+MIT
